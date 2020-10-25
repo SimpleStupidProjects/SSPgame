@@ -1,51 +1,46 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Threading;
 using UnityEngine;
 
 public class character_movment : MonoBehaviour
 {
-    //Movement
-    public float movementSpeed = 5f;
-    public float jumpSpeed = 10f;
-    bool grounded = true;
-
-    private void FixedUpdate()
-    {
-        //get the Input from Horizontal axis
-        float horizontalInput = Input.GetAxis("Horizontal");
-        //get the Input from Vertical axis
-        float verticalInput = Input.GetAxis("Vertical");
-
-        float horizontal_speed = horizontalInput * movementSpeed * Time.deltaTime;
-        float vertical_speed = verticalInput * jumpSpeed * Time.deltaTime;
-        transform.position = transform.position + new Vector3(horizontal_speed,vertical_speed, 0);
-        Debug.Log(transform.position);
+    public float speedscal = 5f;
+    public float speed = 5f;
+  public float jumpSpeed = 8f;
+  private float movement = 0f;
+  private Rigidbody2D rigidBody;
+    public Transform groundCheckPoint;
+    public float groundCheckRadius;
+    public LayerMask groundLayer;
+    private bool grounded;
+  // Use this for initialization
+  void Start () {
+    rigidBody = GetComponent<Rigidbody2D> ();
+  }
+  
+  // Update is called once per frame
+  void Update () {
+        grounded = Physics2D.OverlapCircle(groundCheckPoint.position,groundCheckRadius,groundLayer);
+    movement = Input.GetAxis ("Horizontal");
+    if (movement > 0f) {
+      rigidBody.velocity = new Vector2 (movement * speed * speedscal, rigidBody.velocity.y);
     }
-    void Update()
-    {
-        
+    else if (movement < 0f) {
+      rigidBody.velocity = new Vector2 (movement * speed* speedscal, rigidBody.velocity.y);
+    } 
+    else {
+      rigidBody.velocity = new Vector2 (0,rigidBody.velocity.y);
     }
-    //Check if Grounded
-    void OnTriggerEnter2D()
-    {
-        grounded = true;
+    if(Input.GetButtonDown ("Jump")){
+      rigidBody.velocity = new Vector2(rigidBody.velocity.x,jumpSpeed);
     }
-    void OnTriggerExit2D()
-    {
-        grounded = false;
+        if (Input.GetButtonDown("Jump") && grounded)
+        {
+            rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpSpeed);
+        }
     }
-
-    // WIP
-    //** private void Flip()
-    //{
-    // Switch the way the player is labelled as facing.
-    //m_FacingRight = !m_FacingRight;
-    //
-    // Multiply the player's x local scale by -1.
-    //  Vector3 theScale = transform.localScale;
-    //    theScale.x *= -1;
-    //      transform.localScale = theScale;
-    //    }
 
 }
+
