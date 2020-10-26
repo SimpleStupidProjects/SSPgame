@@ -1,24 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Threading;
 using UnityEngine;
 
 public class character_movment : MonoBehaviour
 {
-    public LayerMask groundLayer;
-    public float speedscal = 5f;
+    [SerializeField] private LayerMask platformlayerMask;
     public float speed = 5f;
-  public float jumpSpeed = 8f;
-  private float movement = 0f;
-  private Rigidbody2D rigidBody;
-    public Transform groundCheckPoint;
-    private bool grounded = false;
+    public float jumpPower = 8f;
+    private float movement = 0f;
+    private Rigidbody2D rigidBody;   
     
+
+    private BoxCollider2D boxCollider;
 
     // Use this for initialization
     void Start () {
     rigidBody = GetComponent<Rigidbody2D> ();
+        boxCollider = transform.GetComponent<BoxCollider2D>();
   }
   
   // Update is called once per frame
@@ -27,23 +28,26 @@ public class character_movment : MonoBehaviour
 
     movement = Input.GetAxis ("Horizontal");
     if (movement > 0f) {
-      rigidBody.velocity = new Vector2 (movement * speed * speedscal, rigidBody.velocity.y);
+      rigidBody.velocity = new Vector2 (movement * speed, rigidBody.velocity.y);
     }
-    else if (movement < 0f) {
-      rigidBody.velocity = new Vector2 (movement * speed* speedscal, rigidBody.velocity.y);
-    } 
-    else {
-      rigidBody.velocity = new Vector2 (0,rigidBody.velocity.y);
-    }
-    if(Input.GetButtonDown ("Jump")){
-      rigidBody.velocity = new Vector2(rigidBody.velocity.x,jumpSpeed);
-    }
-        if (Input.GetButtonDown("Jump"))
-        {
-            rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpSpeed);
-        }
+   
+    if (movement < 0f) {
+      rigidBody.velocity = new Vector2 (movement * speed, rigidBody.velocity.y);
     }
 
+        if (isGrounded() && Input.GetKeyDown(KeyCode.Space))
+        {
+            
+                rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpPower);
+            
+        }
+    }
+    private bool isGrounded()
+    {
+        RaycastHit2D raycastHit = Physics2D.BoxCast(boxCollider.bounds.center, boxCollider.bounds.size, 0f, Vector2.down , .1f, platformlayerMask);
+        UnityEngine.Debug.Log(raycastHit.transform.name);
+        return raycastHit.collider != null;
+    }
 
 }
 
