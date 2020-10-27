@@ -11,21 +11,24 @@ public class character_movment : MonoBehaviour
     public float speed = 5f;
     public float jumpPower = 8f;
     private float movement = 0f;
-    private Rigidbody2D rigidBody;   
-    
-
+    private Rigidbody2D rigidBody;
+    private bool m_FacingRight = true;
+    private bool doubleJump = true;
     private BoxCollider2D boxCollider;
 
     // Use this for initialization
     void Start () {
     rigidBody = GetComponent<Rigidbody2D> ();
         boxCollider = transform.GetComponent<BoxCollider2D>();
+
   }
   
   // Update is called once per frame
   void Update () {
        
+        //TOOO MANY FUCKING IFFFFFFFFFFFFFFFFFFFFFFFFFFFFs
 
+        //Horizontal movement
     movement = Input.GetAxis ("Horizontal");
     if (movement > 0f) {
       rigidBody.velocity = new Vector2 (movement * speed, rigidBody.velocity.y);
@@ -35,11 +38,46 @@ public class character_movment : MonoBehaviour
       rigidBody.velocity = new Vector2 (movement * speed, rigidBody.velocity.y);
     }
 
-        if (isGrounded() && Input.GetKeyDown(KeyCode.Space))
+        // Jumping
+
+        if (isGrounded())
         {
-            
+            doubleJump = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (isGrounded()) {
                 rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpPower);
-            
+            }
+            else
+            if(doubleJump)
+            {                   //WHY ARE YOU NOT WORKING YOU PIECE OF SHIT !!!
+                rigidBody.velocity = new Vector2(rigidBody.velocity.x, jumpPower);
+                doubleJump = false;
+            }
+        }
+       
+        if (isGrounded() && Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            boxCollider.enabled = false;
+        }
+        else
+        {
+            boxCollider.enabled = true;
+        }
+
+        // If the input is moving the player right and the player is facing left...
+        if (movement > 0 && !m_FacingRight)
+        {
+            // ... flip the player.
+            Flip();
+        }
+        // Otherwise if the input is moving the player left and the player is facing right...
+        else if (movement < 0 && m_FacingRight)
+        {
+            // ... flip the player.
+            Flip();
         }
     }
     private bool isGrounded()
@@ -47,6 +85,18 @@ public class character_movment : MonoBehaviour
         RaycastHit2D raycastHit = Physics2D.BoxCast(boxCollider.bounds.center, boxCollider.bounds.size, 0f, Vector2.down , .1f, platformlayerMask);
         UnityEngine.Debug.Log(raycastHit.transform.name);
         return raycastHit.collider != null;
+    }
+
+
+    private void Flip()
+    {
+        // Switch the way the player is labelled as facing.
+        m_FacingRight = !m_FacingRight;
+
+        // Multiply the player's x local scale by -1.
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
     }
 
 }
