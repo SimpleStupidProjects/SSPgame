@@ -9,6 +9,7 @@ public class character_movment : MonoBehaviour
 {
     [SerializeField] private LayerMask platformlayerMask;
     public float speed = 5f;
+    public float Runspeed = 30f;
     //public float jumpPower = 8f;
     private float movementx = 0f;
     private float movementy = 0f;
@@ -31,27 +32,18 @@ public class character_movment : MonoBehaviour
         //TOOO MANY FUCKING IFFFFFFFFFFFFFFFFFFFFFFFFFFFFs
         //we have to be more object oriented :>
         //Horizontal movement
-        movementx = Input.GetAxis("Horizontal");
-        if (movementx > 0f)
-        {
-            rigidBody.velocity = new Vector2(movementx * speed, rigidBody.velocity.y);
-        }
 
-        if (movementx < 0f)
-        {
+        movementx = Input.GetAxis("Horizontal");
+        
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+             rigidBody.velocity = new Vector2(movementx * Runspeed, rigidBody.velocity.y);
+            }
             rigidBody.velocity = new Vector2(movementx * speed, rigidBody.velocity.y);
-        }
 
         movementy = Input.GetAxis("Vertical");
-        if (movementy > 0f)
-        {
             rigidBody.velocity = new Vector2(rigidBody.velocity.x, movementy * speed);
-        }
 
-        if (movementy < 0f)
-        {
-            rigidBody.velocity = new Vector2(rigidBody.velocity.x, movementy * speed);
-        }
 
         // Jumping
 
